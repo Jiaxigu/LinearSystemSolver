@@ -27,11 +27,12 @@ public:
 	Vector GaussElimSolver();
 	Vector LUSolver();
 	Vector CholeskySolver();
-	Vector ConjugateGradientSolver(int max, double tol);
+	Vector ThomasSolver();
 	Vector JacobiSolver(int max, double tol);
 	Vector GaussSeidelSolver(int max, double tol);
 	Vector RichardsonSolver(int max, double tol, double omega);
-//	Vector PreconditionedConjugateGradientSolver(int max, double tol);
+	Vector ConjugateGradientSolver(int max, double tol);
+	Vector PreconditionedConjugateGradientSolver(int max, double tol);
 };
 
 #endif

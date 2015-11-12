@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cassert>
 #include "Vector.hpp"
+using namespace std;
 
 //override copy constructor
 Vector::Vector(const Vector& v1)
@@ -156,10 +157,14 @@ double Vector::CalculateNorm(int p) const
 
 std::ostream& operator<<(std::ostream& output, const Vector& z)
 {
+	cout << showpos;
+	cout.precision(5);
+	cout.setf(ios::fixed, ios::floatfield);
+
 	for (int i=1; i<z.mSize+1; i++)
 	{
 		output << z.Read(i-1) << "\t";
 	}
-	output << std::endl;
+	output << endl;
 	return output;
 }

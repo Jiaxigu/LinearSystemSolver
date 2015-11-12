@@ -13,17 +13,18 @@ int FileOutputMenu();
 void SolverSelect(Matrix A, Vector B);
 void LinearSystemDemo();
 void LinearSystemInputFromCommandLine();
+void LinearSystemInputFromFile();
 
 int main (int argc, char* argv[])
 {
-	static int VERSION = 1;
+	static int VERSION = 2;
 	cout << "////////////////////\n";
 	cout << "Linear System Solver\n";
 	cout << "For MATH-458 Project\n";
 	cout << "////////////////////\n";
 	cout << "Author  -   " << "Jiaxi Gu\n";
 	cout << "Version -   " << VERSION << "\n";
-	cout << "Date    -   " << "01/11/2015\n";
+	cout << "Date    -   " << "12/11/2015\n";
 
 	StartSolver();
 
@@ -46,6 +47,10 @@ void StartSolver()
 			LinearSystemInputFromCommandLine();
 			StartSolver();
 			break;
+		case 3:
+			LinearSystemInputFromFile();
+			StartSolver();
+			break;
 		default:
 			break;
 	}
@@ -57,29 +62,34 @@ int MainMenu()
 	cout << "Menu:\n";
 	cout << "1 - See Demo\n";
 	cout << "2 - Input in command line\n";
-	cout << "3 - Exit\n";
+	cout << "3 - Input from file\n";
+	cout << "4 - Exit\n";
 
 	cin >> index;
-	assert ((index == 1) || (index == 2) || (index == 3));
+	assert ((index == 1) || (index == 2) || (index == 3) || (index ==4));
 	return index;
 }
 
 int SolverMenu()
 {
 	int index;
-	cout << "Menu:\n";
+	cout << "Please select solver:\n";
 	cout << "1 - Gauss Elimination\n";
 	cout << "2 - LU\n";
 	cout << "3 - Cholesky\n";
-	cout << "4 - Conjugate Gradient\n";
+	cout << "4 - Thomas Tridiagonal Algorithm\n";
 	cout << "5 - Jacobi\n";
 	cout << "6 - Gauss-Seidel\n";
 	cout << "7 - Richardson\n";
-	cout << "8 - Return to main menu\n";
+	cout << "8 - Conjugate Gradient\n";
+	cout << "9 - Preconditioned Conjugate Gradient\n";
+	cout << "0 - Return to main menu\n";
 
 	cin >> index;
-	assert ((index == 1) || (index == 2) || (index == 3) || (index == 4) ||
-			(index == 5) || (index == 6) || (index == 7) || (index == 8));
+	assert ((index == 1) || (index == 2) || (index == 3) ||
+			(index == 4) || (index == 5) || (index == 6) ||
+			(index == 7) || (index == 8) || (index == 9) ||
+			(index == 0));
 
 	return index;
 }
@@ -104,7 +114,7 @@ void SolverSelect(Matrix A, Vector B)
 	int index = SolverMenu();
 
 	cout << std::showpos;
-	cout.precision(4);
+	cout.precision(5);
 	cout.setf(std::ios::fixed, std::ios::floatfield);
 
 	if (index == 1)
@@ -124,17 +134,8 @@ void SolverSelect(Matrix A, Vector B)
 	}
 	else if (index == 4)
 	{
-		int maxIter;
-		double tol;
-		cout << "Input maximum number of iterations\n";
-		cin >> maxIter;
-		assert ( maxIter > 0);
-		cout << "Input tolerance\n";
-		cin >> tol;
-		assert (tol > 0);
-
-		x = LS.ConjugateGradientSolver(maxIter, tol);
-		cout << "Conjugate Gradient\n";
+		x = LS.ThomasSolver();
+		cout << "Thomas Tridiagonal Algorithm\n";
 	}
 	else if (index == 5)
 	{
@@ -164,6 +165,7 @@ void SolverSelect(Matrix A, Vector B)
 		x = LS.GaussSeidelSolver(maxIter, tol);
 		cout << "Gauss-Seidel\n";
 	}
+
 	else if (index == 7)
 	{
 		int maxIter;
@@ -182,8 +184,36 @@ void SolverSelect(Matrix A, Vector B)
 		x = LS.RichardsonSolver(maxIter, tol, omega);
 		cout << "Richardson\n";
 	}
+	else if (index == 8)
+	{
+		int maxIter;
+		double tol;
+		cout << "Input maximum number of iterations\n";
+		cin >> maxIter;
+		assert ( maxIter > 0);
+		cout << "Input tolerance\n";
+		cin >> tol;
+		assert (tol > 0);
 
-	if (index != 8)
+		x = LS.ConjugateGradientSolver(maxIter, tol);
+		cout << "Conjugate Gradient\n";
+	}
+	else if (index == 9)
+	{
+		int maxIter;
+		double tol;
+		cout << "Input maximum number of iterations\n";
+		cin >> maxIter;
+		assert ( maxIter > 0);
+		cout << "Input tolerance\n";
+		cin >> tol;
+		assert (tol > 0);
+
+		x = LS.PreconditionedConjugateGradientSolver(maxIter, tol);
+		cout << "Preconditioned Conjugate Gradient\n";
+	}
+
+	if (index != 0)
 	{
 		cout << x;
 		int OutputIndex = FileOutputMenu();
@@ -191,9 +221,8 @@ void SolverSelect(Matrix A, Vector B)
 		{
 			ofstream write_output("Output.dat", ios::app);
 			assert (write_output.is_open());
-			write_output.setf(ios::showpos);
 			write_output.setf(ios::scientific);
-			write_output.precision(4);
+			write_output.precision(5);
 			write_output << x;
 			write_output.close();
 		}
@@ -210,7 +239,7 @@ void LinearSystemDemo ()
 	Vector x(SIZE);
 
 	cout << std::showpos;
-	cout.precision(4);
+	cout.precision(5);
 	cout.setf(std::ios::fixed, std::ios::floatfield);
 
 	cout << "////////////////////////////////\n";
@@ -241,12 +270,12 @@ void LinearSystemDemo ()
 	cout << x;
 
 	//Conjugate Gradient
-	x = LSPD.ConjugateGradientSolver(10, 0.0001);
+	x = LSPD.ConjugateGradientSolver(10, 0.000001);
 	cout << "Conjugate Gradient\n";
 	cout << x;
 
 	//Gauss-Seidel
-	x = LSPD.GaussSeidelSolver(15, 0.0001);
+	x = LSPD.GaussSeidelSolver(15, 0.000001);
 	cout << "Gauss-Seidel\n";
 	cout << x;
 
@@ -259,18 +288,23 @@ void LinearSystemDemo ()
 	LinearSystem LSJ(A,B);
 	cout << "\n2 - Diagonally dominant test set\n";
 
+	//Conjugate Gradient
+	x = LSJ.ConjugateGradientSolver(10, 0.000001);
+	cout << "Conjugate Gradient\n";
+	cout << x;
+
 	//Jacobi
-	x = LSJ.JacobiSolver(10, 0.0001);
+	x = LSJ.JacobiSolver(15, 0.000001);
 	cout << "Jacobi\n";
 	cout << x;
 
 	//Gauss-Seidel
-	x = LSJ.GaussSeidelSolver(10, 0.0001);
+	x = LSJ.GaussSeidelSolver(10, 0.000001);
 	cout << "Gauss-Seidel\n";
 	cout << x;
 
 	//Richardson
-	x = LSJ.RichardsonSolver(10, 0.0001, 0.1);
+	x = LSJ.RichardsonSolver(15, 0.000001, 0.1);
 	cout << "Richardson\n";
 	cout << x;
 
@@ -305,3 +339,34 @@ void LinearSystemInputFromCommandLine ()
 	SolverSelect(A,B);
 }
 
+void LinearSystemInputFromFile()
+{
+	int SIZE;
+	cout << "Size of the linear system (number of rows):\n";
+	cin >> SIZE;
+	Vector B(SIZE);
+	Matrix A(SIZE,SIZE);
+
+	char filename[50];
+	cout << "Please type the name of the input file:\n";
+	cin >> filename;
+
+	ifstream read_file(filename);
+	assert(read_file.is_open());
+	while(!read_file.eof())
+	{
+		for (int i=1; i<SIZE+1; i++)
+		{
+			for (int j=1; j<SIZE+1; j++)
+			{
+				read_file >> A(i,j);
+			}
+		}
+		for (int i=1; i<SIZE+1; i++)
+		{
+			read_file >> B(i);
+		}
+	}
+	read_file.close();
+	SolverSelect(A,B);
+}
