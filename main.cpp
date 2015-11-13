@@ -4,6 +4,7 @@
 #include "Vector.hpp"
 #include "Matrix.hpp"
 #include "LinearSystem.hpp"
+#include "Exception.hpp"
 using namespace std;
 
 void StartSolver();
@@ -14,6 +15,7 @@ void SolverSelect(Matrix A, Vector B);
 void LinearSystemDemo();
 void LinearSystemInputFromCommandLine();
 void LinearSystemInputFromFile();
+void LinearSystemOutputToFile(Vector solution);
 
 int main (int argc, char* argv[])
 {
@@ -28,7 +30,7 @@ int main (int argc, char* argv[])
 
 	StartSolver();
 
-	cout << "Exit successful";
+	cout << "Exit successful\n";
 	return 0;
 }
 
@@ -65,8 +67,13 @@ int MainMenu()
 	cout << "3 - Input from file\n";
 	cout << "4 - Exit\n";
 
-	cin >> index;
-	assert ((index == 1) || (index == 2) || (index == 3) || (index ==4));
+	while ( !(cin >> index) || ((index != 1) && (index != 2) && (index != 3) && (index != 4)))
+	{
+		cout << "Bad input - try again\n";
+		cin.clear();
+		cin.get();
+	}
+
 	return index;
 }
 
@@ -85,12 +92,17 @@ int SolverMenu()
 	cout << "9 - Preconditioned Conjugate Gradient\n";
 	cout << "0 - Return to main menu\n";
 
-	cin >> index;
-	assert ((index == 1) || (index == 2) || (index == 3) ||
-			(index == 4) || (index == 5) || (index == 6) ||
-			(index == 7) || (index == 8) || (index == 9) ||
-			(index == 0));
-
+	while ( !(cin >> index) ||
+			((index != 1) && (index != 2) &&
+			 (index != 3) && (index != 4) &&
+			 (index != 5) && (index != 6) &&
+			 (index != 7) && (index != 8) &&
+			 (index != 9) && (index != 0)) )
+	{
+		cout << "Bad input - try again\n";
+		cin.clear();
+		cin.get();
+	}
 	return index;
 }
 
@@ -101,8 +113,12 @@ int FileOutputMenu()
 	cout << "1 - Yes\n";
 	cout << "2 - No\n";
 
-	cin >> index;
-	assert ((index == 1) || (index == 2));
+	while ( !(cin >> index) || ((index != 1) && (index != 2)))
+	{
+		cout << "Bad input - try again\n";
+		cin.clear();
+		cin.get();
+	}
 	return index;
 }
 
@@ -216,16 +232,7 @@ void SolverSelect(Matrix A, Vector B)
 	if (index != 0)
 	{
 		cout << x;
-		int OutputIndex = FileOutputMenu();
-		if (OutputIndex == 1)
-		{
-			ofstream write_output("Output.dat", ios::app);
-			assert (write_output.is_open());
-			write_output.setf(ios::scientific);
-			write_output.precision(5);
-			write_output << x;
-			write_output.close();
-		}
+		LinearSystemOutputToFile(x);
 		SolverSelect(A,B);
 	}
 }
@@ -286,7 +293,7 @@ void LinearSystemDemo ()
 	A(2,1) = -2; 	A(2,2) = 10; 	A(2,3) = -1;
 	A(3,1) = -1; 	A(3,2) = -2; 	A(3,3) = 5;
 	LinearSystem LSJ(A,B);
-	cout << "\n2 - Diagonally dominant test set\n";
+	cout << "\n2 - Diagonally dominant demo set\n";
 
 	//Conjugate Gradient
 	x = LSJ.ConjugateGradientSolver(10, 0.000001);
@@ -315,7 +322,12 @@ void LinearSystemInputFromCommandLine ()
 {
 	int SIZE;
 	cout << "Size of the linear system (number of rows):\n";
-	cin >> SIZE;
+	while (!(cin >> SIZE) || (SIZE < 0))
+	{
+		cout << "Bad input - try again\n";
+		cin.clear();
+		cin.get();
+	}
 	Vector B(SIZE);
 	Matrix A(SIZE,SIZE);
 
@@ -329,7 +341,6 @@ void LinearSystemInputFromCommandLine ()
 			cin >> A(i,j);
 		}
 	}
-
 	for (int i=1; i<SIZE+1; i++)
 	{
 		cout << "Input " << i << "th element in b\n";
@@ -342,31 +353,74 @@ void LinearSystemInputFromCommandLine ()
 void LinearSystemInputFromFile()
 {
 	int SIZE;
+	bool ERROR_FLAG = false;
 	cout << "Size of the linear system (number of rows):\n";
-	cin >> SIZE;
+	while (!(cin >> SIZE) || (SIZE < 0))
+	{
+		cout << "Bad input - try again.\n";
+		cin.clear();
+		cin.get();
+	}
 	Vector B(SIZE);
 	Matrix A(SIZE,SIZE);
-
-	char filename[50];
-	cout << "Please type the name of the input file:\n";
-	cin >> filename;
-
-	ifstream read_file(filename);
-	assert(read_file.is_open());
-	while(!read_file.eof())
+	try
 	{
-		for (int i=1; i<SIZE+1; i++)
+		char filename[50];
+		cout << "Please type the name of the input file:\n";
+		cin >> filename;
+		ifstream read_file(filename);
+		if(read_file.is_open() == false)
 		{
-			for (int j=1; j<SIZE+1; j++)
+			throw (Exception("FILE", "Can not read file"));
+		}
+		while(!read_file.eof())
+		{
+			for (int i=1; i<SIZE+1; i++)
 			{
-				read_file >> A(i,j);
+				for (int j=1; j<SIZE+1; j++)
+				{
+					read_file >> A(i,j);
+				}
+			}
+			for (int i=1; i<SIZE+1; i++)
+			{
+				read_file >> B(i);
 			}
 		}
-		for (int i=1; i<SIZE+1; i++)
+		read_file.close();
+	}
+	catch (Exception& error)
+	{
+		ERROR_FLAG = true;
+		error.PrintDebug();
+		LinearSystemInputFromFile();
+	}
+	if(!ERROR_FLAG)
+	SolverSelect(A,B);
+}
+
+void LinearSystemOutputToFile(Vector solution)
+{
+	int OutputIndex = FileOutputMenu();
+	if (OutputIndex == 1)
+	{
+		try
 		{
-			read_file >> B(i);
+			ofstream write_output("Output.dat", ios::app);
+			if(write_output.is_open() == false)
+			{
+				throw (Exception("FILE", "Can not write to file"));
+			}
+			write_output.setf(ios::scientific);
+			write_output.precision(5);
+			write_output << solution;
+			write_output.close();
+		}
+
+		catch (Exception& error)
+		{
+			error.PrintDebug();
+			LinearSystemOutputToFile(solution);
 		}
 	}
-	read_file.close();
-	SolverSelect(A,B);
 }

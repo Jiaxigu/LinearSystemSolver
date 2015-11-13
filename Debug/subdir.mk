@@ -4,18 +4,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../Exception.cpp \
 ../LinearSystem.cpp \
 ../Matrix.cpp \
 ../Vector.cpp \
 ../main.cpp 
 
 OBJS += \
+./Exception.o \
 ./LinearSystem.o \
 ./Matrix.o \
 ./Vector.o \
 ./main.o 
 
 CPP_DEPS += \
+./Exception.d \
 ./LinearSystem.d \
 ./Matrix.d \
 ./Vector.d \
