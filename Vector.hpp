@@ -34,6 +34,4 @@ public:
 	friend std::ostream& operator<<(std::ostream& output, const Vector& z);
 };
 
-int length(const Vector& v);
-
 #endif
