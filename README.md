@@ -28,3 +28,16 @@ To build and run tests:
     cmake -Dtest=ON ..
     make
     ./runUnitTests
+
+# How to import from file
+The file should be composed like:
+A11 A12 ... A1n
+A21 ... ... A2n
+... ... ... ...
+An1 An2 ... Ann
+B1  B2  ... Bn
+
+in which Ax = B.
+
+Numbers are divided by tab or space.
+File should be in the main directory of this project.
