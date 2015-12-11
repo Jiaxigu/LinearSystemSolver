@@ -1,10 +1,18 @@
-#include <iostream>
-#include <cassert>
-#include <fstream>
 #include "Vector.hpp"
 #include "Matrix.hpp"
 #include "LinearSystem.hpp"
+#include "LUSolver.hpp"
+#include "CholeskySolver.hpp"
+#include "JacobiSolver.hpp"
+#include "GaussSeidelSolver.hpp"
+#include "ConjugateGradientSolver.hpp"
+#include "PCGSolver.hpp"
+#include "RichardsonSolver.hpp"
+#include "ThomasSolver.hpp"
 #include "Exception.hpp"
+#include <iostream>
+#include <cassert>
+#include <fstream>
 using namespace std;
 
 void StartSolver();
@@ -19,14 +27,14 @@ void LinearSystemOutputToFile(Vector solution);
 
 int main (int argc, char* argv[])
 {
-	static int VERSION = 2;
+	static int VERSION = 3;
 	cout << "////////////////////\n";
 	cout << "Linear System Solver\n";
 	cout << "For MATH-458 Project\n";
 	cout << "////////////////////\n";
 	cout << "Author  -   " << "Jiaxi Gu\n";
 	cout << "Version -   " << VERSION << "\n";
-	cout << "Date    -   " << "12/11/2015\n";
+	cout << "Date    -   " << "10/12/2015\n";
 
 	StartSolver();
 
@@ -81,23 +89,20 @@ int SolverMenu()
 {
 	int index;
 	cout << "Please select solver:\n";
-	cout << "1 - Gauss Elimination\n";
-	cout << "2 - LU\n";
-	cout << "3 - Cholesky\n";
-	cout << "4 - Thomas Tridiagonal Algorithm\n";
-	cout << "5 - Jacobi\n";
-	cout << "6 - Gauss-Seidel\n";
-	cout << "7 - Richardson\n";
-	cout << "8 - Conjugate Gradient\n";
-	cout << "9 - Preconditioned Conjugate Gradient\n";
+	cout << "1 - LU\n";
+	cout << "2 - Cholesky\n";
+	cout << "3 - Jacobi\n";
+	cout << "4 - Gauss-Seidel\n";
+	cout << "5 - Richardson\n";
+	cout << "6 - Conjugate Gradient\n";
+	cout << "7 - Preconditioned Conjugate Gradient\n";
+	cout << "8 - Thomas Tridiagonal Algorithm\n";
 	cout << "0 - Return to main menu\n";
 
 	while ( !(cin >> index) ||
-			((index != 1) && (index != 2) &&
-			 (index != 3) && (index != 4) &&
-			 (index != 5) && (index != 6) &&
-			 (index != 7) && (index != 8) &&
-			 (index != 9) && (index != 0)) )
+			((index != 1) && (index != 2) && (index != 3) &&
+			 (index != 4) && (index != 5) && (index != 6) &&
+			 (index != 7) && (index != 8) && (index != 0)))
 	{
 		cout << "Bad input - try again\n";
 		cin.clear();
@@ -124,9 +129,9 @@ int FileOutputMenu()
 
 void SolverSelect(Matrix A, Vector B)
 {
-	LinearSystem LS(A,B);
-	int SIZE = LS.GetSize();
+	int SIZE = B.GetSize();
 	Vector x(SIZE);
+
 	int index = SolverMenu();
 
 	cout << std::showpos;
@@ -135,98 +140,53 @@ void SolverSelect(Matrix A, Vector B)
 
 	if (index == 1)
 	{
-		x = LS.GaussElimSolver();
-		cout << "Gauss Elimination\n";
+		LUSolver LS(A,B);
+		x = LS.Solve();
+		cout << LS.GetName() << endl;
 	}
 	else if (index == 2)
 	{
-		x = LS.LUSolver();
-		cout << "LU\n";
+		CholeskySolver LS(A,B);
+		x = LS.Solve();
+		cout << LS.GetName() << endl;
 	}
 	else if (index == 3)
 	{
-		x = LS.CholeskySolver();
-		cout << "Cholesky\n";
+		JacobiSolver LS(A,B);
+		x = LS.Solve();
+		cout << LS.GetName() << endl;
 	}
 	else if (index == 4)
 	{
-		x = LS.ThomasSolver();
-		cout << "Thomas Tridiagonal Algorithm\n";
+		GaussSeidelSolver LS(A,B);
+		x = LS.Solve();
+		cout << LS.GetName() << endl;
 	}
 	else if (index == 5)
 	{
-		int maxIter;
-		double tol;
-		cout << "Input maximum number of iterations\n";
-		cin >> maxIter;
-		assert ( maxIter > 0);
-		cout << "Input tolerance\n";
-		cin >> tol;
-		assert (tol > 0);
-
-		x = LS.JacobiSolver(maxIter, tol);
-		cout << "Jacobi\n";
+		RichardsonSolver LS(A,B);
+		x = LS.Solve();
+		cout << LS.GetName() << endl;
 	}
 	else if (index == 6)
 	{
-		int maxIter;
-		double tol;
-		cout << "Input maximum number of iterations\n";
-		cin >> maxIter;
-		assert ( maxIter > 0);
-		cout << "Input tolerance\n";
-		cin >> tol;
-		assert (tol > 0);
-
-		x = LS.GaussSeidelSolver(maxIter, tol);
-		cout << "Gauss-Seidel\n";
+		ConjugateGradientSolver LS(A,B);
+		x = LS.Solve();
+		cout << LS.GetName() << endl;
 	}
 
 	else if (index == 7)
 	{
-		int maxIter;
-		double tol;
-		double omega;
-		cout << "Input maximum number of iterations\n";
-		cin >> maxIter;
-		assert ( maxIter > 0);
-		cout << "Input tolerance\n";
-		cin >> tol;
-		assert (tol > 0.0);
-		cout << "Input omega\n";
-		cin >> omega;
-		assert (omega > 0.0);
+		PCGSolver LS(A,B);
+		x = LS.Solve();
+		cout << LS.GetName() << endl;
 
-		x = LS.RichardsonSolver(maxIter, tol, omega);
-		cout << "Richardson\n";
 	}
 	else if (index == 8)
 	{
-		int maxIter;
-		double tol;
-		cout << "Input maximum number of iterations\n";
-		cin >> maxIter;
-		assert ( maxIter > 0);
-		cout << "Input tolerance\n";
-		cin >> tol;
-		assert (tol > 0);
-
-		x = LS.ConjugateGradientSolver(maxIter, tol);
-		cout << "Conjugate Gradient\n";
-	}
-	else if (index == 9)
-	{
-		int maxIter;
-		double tol;
-		cout << "Input maximum number of iterations\n";
-		cin >> maxIter;
-		assert ( maxIter > 0);
-		cout << "Input tolerance\n";
-		cin >> tol;
-		assert (tol > 0);
-
-		x = LS.PreconditionedConjugateGradientSolver(maxIter, tol);
-		cout << "Preconditioned Conjugate Gradient\n";
+		ThomasSolver LS(A,B);
+		x = LS.Solve();
+		cout << LS.GetName() << endl;
 	}
 
 	if (index != 0)
@@ -235,6 +195,8 @@ void SolverSelect(Matrix A, Vector B)
 		LinearSystemOutputToFile(x);
 		SolverSelect(A,B);
 	}
+
+
 }
 
 void LinearSystemDemo ()
@@ -249,73 +211,26 @@ void LinearSystemDemo ()
 	cout.precision(5);
 	cout.setf(std::ios::fixed, std::ios::floatfield);
 
-	cout << "////////////////////////////////\n";
-	cout << "Demo for my linear system solver\n";
-	cout << "////////////////////////////////\n";
+	cout << "///////////////////////\n";
+	cout << "Demo for direct methods\n";
+	cout << "///////////////////////\n";
 
 	//1 - Positive-definite matrix demo set
 	B(1) = 10; 		B(2) = 5; 		B(3) = 4;
 	A(1,1) = 4; 	A(1,2) = 2; 	A(1,3) = -2;
 	A(2,1) = 2; 	A(2,2) = 2; 	A(2,3) = -3;
 	A(3,1) = -2; 	A(3,2) = -3; 	A(3,3) = 14;
-	LinearSystem LSPD(A,B);
 	cout << "\n1 - Positive-definite demo set\n";
 
-	//Gauss Elimination
-	x = LSPD.GaussElimSolver();
-	std::cout << "Gauss Elimination\n";
-	cout << x;
-
 	//LU
-	x = LSPD.LUSolver();
-	cout << "LU\n";
-	cout <<  x;
+	LUSolver LU(A,B);
+	cout << LU.GetName() << endl;
+	cout << LU.Solve() << endl;
 
 	//Cholesky
-	x = LSPD.CholeskySolver();
-	cout << "Cholesky\n";
-	cout << x;
-
-	//Conjugate Gradient
-	x = LSPD.ConjugateGradientSolver(10, 0.000001);
-	cout << "Conjugate Gradient\n";
-	cout << x;
-
-	//Gauss-Seidel
-	x = LSPD.GaussSeidelSolver(15, 0.000001);
-	cout << "Gauss-Seidel\n";
-	cout << x;
-
-
-	//2 - Diagonally dominant matrix test set
-	B(1) = 3; 		B(2) = 15; 		B(3) = 10;
-	A(1,1) = 10; 	A(1,2) = -2; 	A(1,3) = -1;
-	A(2,1) = -2; 	A(2,2) = 10; 	A(2,3) = -1;
-	A(3,1) = -1; 	A(3,2) = -2; 	A(3,3) = 5;
-	LinearSystem LSJ(A,B);
-	cout << "\n2 - Diagonally dominant demo set\n";
-
-	//Conjugate Gradient
-	x = LSJ.ConjugateGradientSolver(10, 0.000001);
-	cout << "Conjugate Gradient\n";
-	cout << x;
-
-	//Jacobi
-	x = LSJ.JacobiSolver(15, 0.000001);
-	cout << "Jacobi\n";
-	cout << x;
-
-	//Gauss-Seidel
-	x = LSJ.GaussSeidelSolver(10, 0.000001);
-	cout << "Gauss-Seidel\n";
-	cout << x;
-
-	//Richardson
-	x = LSJ.RichardsonSolver(15, 0.000001, 0.1);
-	cout << "Richardson\n";
-	cout << x;
-
-	cout << "\n";
+	CholeskySolver Cholesky(A,B);
+	cout << Cholesky.GetName() << endl;
+	cout << Cholesky.Solve() << endl;
 }
 
 void LinearSystemInputFromCommandLine ()
@@ -357,7 +272,7 @@ void LinearSystemInputFromFile()
 	cout << "Size of the linear system (number of rows):\n";
 	while (!(cin >> SIZE) || (SIZE < 0))
 	{
-		cout << "Bad input - try again.\n";
+		cout << "Bad input - try again\n";
 		cin.clear();
 		cin.get();
 	}
@@ -396,7 +311,9 @@ void LinearSystemInputFromFile()
 		LinearSystemInputFromFile();
 	}
 	if(!ERROR_FLAG)
-	SolverSelect(A,B);
+	{
+		SolverSelect(A,B);
+	}
 }
 
 void LinearSystemOutputToFile(Vector solution)
@@ -404,9 +321,13 @@ void LinearSystemOutputToFile(Vector solution)
 	int OutputIndex = FileOutputMenu();
 	if (OutputIndex == 1)
 	{
+
 		try
 		{
-			ofstream write_output("Output.dat", ios::app);
+			char filename[50];
+			cout << "Please type the name of the input file:\n";
+			cin >> filename;
+			ofstream write_output(filename, ios::app);
 			if(write_output.is_open() == false)
 			{
 				throw (Exception("FILE", "Can not write to file"));

@@ -1,12 +1,3 @@
-/*
- * Name:	Matrix.hpp
- * Created:	22nd October, 2015
- * Author:	Jiaxi Gu
- *
- * Part of MATH-458 project
- * All rights reserved
- */
-
 #ifndef MATRIXHEADERDEF
 #define MATRIXHEADERDEF
 #include "Vector.hpp"

@@ -1,14 +1,6 @@
-/*
- * Name:	Vector.hpp
- * Created:	22nd October, 2015
- * Author:	Jiaxi Gu
- *
- * Part of MATH-458 project
- * All rights reserved
- */
-
 #ifndef VECTORHEADERDEF
 #define VECTORHEADERDEF
+#include <iostream>
 
 class Vector
 {
@@ -33,5 +25,7 @@ public:
 	double CalculateNorm(int p=2) const;
 	friend std::ostream& operator<<(std::ostream& output, const Vector& z);
 };
+
+std::ostream& operator<<(std::ostream& output, const Vector& z);
 
 #endif
