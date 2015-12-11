@@ -281,7 +281,7 @@ void LinearSystemInputFromFile()
 	try
 	{
 		char filename[50];
-		cout << "Please type the name of the input file:\n";
+		cout << "Please type the name of the output file:\n";
 		cin >> filename;
 		ifstream read_file(filename);
 		if(read_file.is_open() == false)

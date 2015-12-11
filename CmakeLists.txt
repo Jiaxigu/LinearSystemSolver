@@ -1,0 +1,28 @@
+cmake_minimum_required (VERSION 2.6)
+project (LinearSystemSolver)
+add_executable(LinearSystemSolver
+CholeskySolver.cpp
+CholeskySolver.hpp
+ConjugateGradientSolver.cpp
+ConjugateGradientSolver.hpp
+Exception.cpp
+Exception.hpp
+GaussSeidelSolver.cpp
+GaussSeidelSolver.hpp
+JacobiSolver.cpp
+JacobiSolver.hpp
+LUSolver.cpp
+LUSolver.hpp
+LinearSystem.cpp
+LinearSystem.hpp
+Matrix.cpp
+Matrix.hpp
+PCGSolver.cpp
+PCGSolver.hpp
+RichardsonSolver.cpp
+RichardsonSolver.hpp
+ThomasSolver.cpp
+ThomasSolver.hpp
+Vector.cpp
+Vector.hpp
+main.cpp)

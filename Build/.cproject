@@ -385,14 +385,14 @@
 </target>
 <target name="Build" path="[Targets]/[exe] LinearSystemSolver" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>/usr/bin/make</buildCommand>
-<buildArguments>-C "/Users/macnirgu/documents/workspace/LinearSystemSolver" -j4</buildArguments>
+<buildArguments>-C "/Users/macnirgu/Documents/workspace/LinearSystemSolver/Build" -j4</buildArguments>
 <buildTarget>LinearSystemSolver</buildTarget>
 <stopOnError>true</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
 <target name="Clean" path="[Targets]/[exe] LinearSystemSolver" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>/Applications/CMake.app/Contents/bin/cmake</buildCommand>
-<buildArguments>-E chdir "/Users/macnirgu/documents/workspace/LinearSystemSolver" "/Applications/CMake.app/Contents/bin/cmake" -P "CMakeFiles/LinearSystemSolver.dir/cmake_clean.cmake"</buildArguments>
+<buildArguments>-E chdir "/Users/macnirgu/Documents/workspace/LinearSystemSolver/Build" "/Applications/CMake.app/Contents/bin/cmake" -P "CMakeFiles/LinearSystemSolver.dir/cmake_clean.cmake"</buildArguments>
 <buildTarget></buildTarget>
 <stopOnError>true</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
