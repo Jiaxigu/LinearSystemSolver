@@ -1,7 +1,5 @@
 #include <iostream>
 #include "Exception.hpp"
-using namespace std;
-
 Exception::Exception(std::string tagString, std::string problemString)
 {
 	mTag = tagString;
@@ -10,6 +8,6 @@ Exception::Exception(std::string tagString, std::string problemString)
 
 void Exception::PrintDebug() const
 {
-	cerr << "Error (" << mTag << ")" << endl;
-	cerr << "Problem: " << mProblem << endl;
+	std::cerr << "Error (" << mTag << ")" << std::endl;
+	std::cerr << "Problem: " << mProblem << std::endl;
 }

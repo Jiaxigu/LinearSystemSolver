@@ -254,9 +254,9 @@ Vector operator*(const Matrix& m, const Vector& v)
 {
 	int vSize = v.GetSize();
 	assert(m.GetCols() == vSize);
-	vSize = m.GetRows();
-	Vector vNew(vSize);
-	for (int i=0;i<vSize; i++)
+	int mSize = m.GetRows();
+	Vector vNew(mSize);
+	for (int i=0; i<mSize; i++)
 	{
 		for (int j=0; j<vSize; j++)
 		{
@@ -271,9 +271,9 @@ Vector operator*(const Vector& v, const Matrix& m)
 {
 	int vSize = v.GetSize();
 	assert(m.GetRows() == vSize);
-	vSize = m.GetCols();
-	Vector vNew(vSize);
-	for (int i=0;i<vSize; i++)
+	int mSize = m.GetCols();
+	Vector vNew(mSize);
+	for (int i=0; i<mSize; i++)
 	{
 		for (int j=0; j<vSize; j++)
 		{
