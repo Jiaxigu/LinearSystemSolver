@@ -25,4 +25,5 @@ ThomasSolver.cpp
 ThomasSolver.hpp
 Vector.cpp
 Vector.hpp
-main.cpp)
+main.cpp
+)
