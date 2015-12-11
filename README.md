@@ -44,3 +44,6 @@ in which Ax = B.
 
 Elements are divided by tab or space.
 Source file should be in the root directory.
+
+## Thanks to
+[This case](https://github.com/dmonopoly/gtest-cmake-example) really helps a lot in implementing CMake + google test.
